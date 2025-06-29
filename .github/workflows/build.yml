@@ -20,7 +20,7 @@ jobs:
 
       - name: Setup rclone config
         run: |
-          echo "${{ secrets.GDRIVE_SERVICE_ACCOUNT }}" > gdrive-key.json
+          echo '${{ secrets.GDRIVE_SERVICE_ACCOUNT }}' > gdrive-key.json
           rclone config create gdrive drive scope=drive service_account_file=gdrive-key.json
 
       - name: Upload firmware to Google Drive
