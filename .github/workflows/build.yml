@@ -3,3 +3,26 @@ on: [push, pull_request, workflow_dispatch]
 jobs:
   build:
     uses: zmkfirmware/zmk/.github/workflows/build-user-config.yml@main
+
+  upload_to_drive:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download firmware artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: firmware
+          path: ./firmware
+
+      - name: Install rclone
+        run: curl https://rclone.org/install.sh | sudo bash
+
+      - name: Setup rclone config
+        run: |
+          echo "${{ secrets.GDRIVE_SERVICE_ACCOUNT }}" > gdrive-key.json
+          rclone config create gdrive drive scope=drive service_account_file=gdrive-key.json
+
+      - name: Upload firmware to Google Drive
+        run: |
+          rclone copy ./firmware gdrive: --drive-root-folder-id=1F4x8Qq8Dd-yLJHzrue0h2OTdNaSkhf2x --progress
